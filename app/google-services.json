@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "22024312919",
+    "firebase_url": "https://myprojects-9c5a7.firebaseio.com",
+    "project_id": "myprojects-9c5a7",
+    "storage_bucket": "myprojects-9c5a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:22024312919:android:b177b25b1e163ffd516b12",
+        "android_client_info": {
+          "package_name": "dev.similin.cloudchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "22024312919-1q9dqttm7ecoj4cm4bon4tps3oaebav0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.similin.cloudchat",
+            "certificate_hash": "668b84cf277f91b3d9f6b5a39b2e8133d03dca5b"
+          }
+        },
+        {
+          "client_id": "22024312919-0jhlg3f9p9v6i602voaaphgl1tq14ani.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADxjwQvVhRpx1exwfqVBgLsJ2QZTtFv28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "22024312919-0jhlg3f9p9v6i602voaaphgl1tq14ani.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
