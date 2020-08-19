@@ -10,4 +10,8 @@ class ChatPreference(context: Context) {
     fun putString(data: String) {
         preference.edit { putString(COUNTRY_CODE, data) }
     }
+
+    fun getCountryCode(): String? {
+        return preference.getString(COUNTRY_CODE,"")
+    }
 }

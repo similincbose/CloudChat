@@ -1,14 +1,13 @@
 package dev.similin.cloudchat.ui.login
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -48,6 +47,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.countryCodePicker.setDefaultCountryUsingNameCode("IN")
+        viewModel.saveCountryCode("91")
         binding.edtPhoneNumber.requestFocus()
         setListenerMethods()
     }
@@ -56,8 +56,6 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun setListenerMethods() {
         binding.countryCodePicker.setOnCountryChangeListener(this)
         binding.btnLogin.setOnClickListener {
-            viewModel.onLoginButtonClicked()
-            doAnimation()
             startPhoneNumberVerification()
         }
 
@@ -95,6 +93,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         binding.btnLogin.visibility = View.GONE
         slideDown(binding.btnVerify)
         slideDown(binding.tvResendOtp)
+        slideDown(binding.tvTimerResend)
         binding.edtPhoneNumber.isEnabled = false
         binding.btnLogin.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
     }
@@ -102,12 +101,10 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun setFirebaseCallBack() {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                Log.d(TAG, "onVerificationCompleted:$credential")
                 viewModel.verificationInProgress = false
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
-                Log.w(TAG, "onVerificationFailed", e)
                 viewModel.verificationInProgress = false
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     Toast.makeText(context, "Invalid phone number", Toast.LENGTH_SHORT).show()
@@ -120,17 +117,35 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 verificationId: String,
                 token: PhoneAuthProvider.ForceResendingToken
             ) {
-                Log.d(TAG, "onCodeSent:$verificationId")
+                viewModel.onLoginButtonClicked()
+                doAnimation()
                 viewModel.storedVerificationId = verificationId
+                viewModel.startTimer(TIME_IN_MILLI_SECONDS)
+                updateTimer();
                 resendToken = token
             }
         }
     }
 
+    private fun updateTimer() {
+        viewModel.currentTime.observe(viewLifecycleOwner, Observer {
+            it?.let { time ->
+                when (time) {
+                    "00:00" -> {
+                        binding.tvResendOtp.visibility = View.GONE
+                        binding.tvTimerResend.visibility = View.GONE
+                    }
+                    else -> binding.tvTimerResend.text = time
+                }
+
+            }
+        })
+    }
+
     private fun startPhoneNumberVerification() {
         viewModel.phoneNumber?.let {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                "+91$it",
+                "+" + viewModel.getCountryCode() + "" + it,
                 60,
                 TimeUnit.SECONDS,
                 requireActivity(),
@@ -146,18 +161,16 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         signInWithPhoneAuthCredential(credential)
     }
 
-    @SuppressLint("ShowToast")
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithCredential:success")
                     val user = task.result?.user
                     if (user != null) {
-                        Toast.makeText(context, "Logged In \n" + user.uid, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Success", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                     }
                 }
@@ -166,6 +179,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
 
     companion object {
         private const val TAG = "LoginFragment"
+        private const val TIME_IN_MILLI_SECONDS = 60000L
     }
 }
 
