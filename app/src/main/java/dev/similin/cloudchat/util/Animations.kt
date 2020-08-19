@@ -5,9 +5,7 @@ import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 
-class Animations{
-
-}fun slideUp(view: View) {
+fun slideUp(view: View) {
     view.post {
         val height = view.height
         val valueAnimator = ObjectAnimator.ofInt(height, 0)
@@ -32,7 +30,7 @@ fun slideDown(view: View) {
     view.layoutParams = layoutParams
     view.measure(
         View.MeasureSpec.makeMeasureSpec(
-            Resources.getSystem().getDisplayMetrics().widthPixels,
+            Resources.getSystem().displayMetrics.widthPixels,
             View.MeasureSpec.EXACTLY
         ),
         View.MeasureSpec.makeMeasureSpec(
@@ -45,13 +43,13 @@ fun slideDown(view: View) {
     valueAnimator.addUpdateListener { animation ->
         val value = animation.animatedValue as Int
         if (height > value) {
-            val layoutParams = view.layoutParams
-            layoutParams.height = value
-            view.layoutParams = layoutParams
+            val layoutParams1 = view.layoutParams
+            layoutParams1.height = value
+            view.layoutParams = layoutParams1
         } else {
-            val layoutParams = view.layoutParams
-            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            view.layoutParams = layoutParams
+            val layoutParams1 = view.layoutParams
+            layoutParams1.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            view.layoutParams = layoutParams1
         }
     }
     valueAnimator.start()
