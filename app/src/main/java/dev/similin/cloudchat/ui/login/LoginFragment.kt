@@ -1,13 +1,18 @@
 package dev.similin.cloudchat.ui.login
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.github.razir.progressbutton.bindProgressButton
+import com.github.razir.progressbutton.showDrawable
+import com.github.razir.progressbutton.showProgress
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -16,6 +21,7 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.hbb20.CountryCodePicker
 import dev.similin.cloudchat.CloudChatApplication
+import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentLoginBinding
 import dev.similin.cloudchat.util.slideDown
 import dev.similin.cloudchat.util.slideUp
@@ -39,6 +45,8 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         val repository = (activity?.application as CloudChatApplication).getLoginRepository()
         factory = LoginViewModelFactory(repository)
         binding.viewModel = viewModel
+        bindProgressButton(binding.btnLogin)
+        bindProgressButton(binding.btnVerify)
         auth = FirebaseAuth.getInstance()
         setFirebaseCallBack();
         return binding.root
@@ -56,12 +64,20 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun setListenerMethods() {
         binding.countryCodePicker.setOnCountryChangeListener(this)
         binding.btnLogin.setOnClickListener {
+            binding.btnLogin.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            binding.btnLogin.showProgress {
+                progressColor = Color.WHITE
+            }
             startPhoneNumberVerification()
         }
 
         binding.btnVerify.setOnClickListener {
             val code = binding.pinview.value
             binding.btnVerify.requestFocus()
+            binding.btnVerify.showProgress {
+                progressColor = Color.WHITE
+
+            }
             code?.let { pin ->
                 if (pin.length == 6) {
                     verifyPhoneNumberWithCode(viewModel.storedVerificationId, pin)
@@ -81,13 +97,13 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         viewModel.clicked.observe(viewLifecycleOwner, {
             it?.let { clicked ->
                 if (clicked) {
-                    doAnimation()
+                    updateUI()
                 }
             }
         })
     }
 
-    private fun doAnimation() {
+    private fun updateUI() {
         slideUp(binding.logo)
         slideDown(binding.pinview)
         binding.btnLogin.visibility = View.GONE
@@ -118,7 +134,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 token: PhoneAuthProvider.ForceResendingToken
             ) {
                 viewModel.onLoginButtonClicked()
-                doAnimation()
+                updateUI()
                 viewModel.storedVerificationId = verificationId
                 viewModel.startTimer(TIME_IN_MILLI_SECONDS)
                 updateTimer();
@@ -134,6 +150,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                     "00:00" -> {
                         binding.tvResendOtp.visibility = View.GONE
                         binding.tvTimerResend.visibility = View.GONE
+                        slideUp(binding.tvResend)
                     }
                     else -> binding.tvTimerResend.text = time
                 }
@@ -167,6 +184,14 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 if (task.isSuccessful) {
                     val user = task.result?.user
                     if (user != null) {
+                        val animatedDrawable =
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_tick)
+                        animatedDrawable?.setBounds(0, 0, 40, 40)
+                        if (animatedDrawable != null) {
+                            binding.btnVerify.showDrawable(animatedDrawable) {
+                                buttonTextRes = R.string.verified
+                            }
+                        }
                         Toast.makeText(context, "Success", Toast.LENGTH_SHORT)
                             .show()
                     }

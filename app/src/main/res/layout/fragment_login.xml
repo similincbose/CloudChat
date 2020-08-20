@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
@@ -63,7 +64,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/edt_phone_number" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -107,7 +108,7 @@
             app:pinLength="6"
             app:pinWidth="40dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_verify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -148,6 +149,18 @@
             app:layout_constraintStart_toEndOf="@+id/tv_resend_otp"
             app:layout_constraintTop_toTopOf="@+id/tv_resend_otp"
             app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/tv_resend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Resend OTP"
+            android:visibility="gone"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="@+id/btn_verify"
+            app:layout_constraintStart_toStartOf="@+id/btn_verify"
+            app:layout_constraintTop_toBottomOf="@+id/btn_verify" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

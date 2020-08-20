@@ -73,4 +73,8 @@ dependencies {
 
     //pinview library dependency
     implementation "com.github.GoodieBag:Pinview:v1.4"
+
+    //progress button
+    implementation 'br.com.simplepass:loading-button-android:2.2.0'
+    implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
 }
