@@ -5,14 +5,17 @@ import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.PhoneAuthProvider
 import dev.similin.cloudchat.repository.LoginRepository
 
 class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
     var phoneNumber: String? = null
+    var uid: String? = null
     val clicked = MutableLiveData<Boolean>()
     var time_in_milli_seconds = MutableLiveData<Long>()
     var verificationInProgress = false
     var storedVerificationId: String? = null
+    var _resendToken: PhoneAuthProvider.ForceResendingToken? = null
     val currentTime = Transformations.map(time_in_milli_seconds) { time ->
         DateUtils.formatElapsedTime(time)
     }
@@ -20,6 +23,10 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
     fun saveCountryCode(countryCode: String) = repo.saveCountryCode(countryCode)
 
     fun getCountryCode(): String? = repo.getCountryCode()
+
+    fun saveUserID(uid: String) = repo.saveUserID(uid)
+
+    fun getUserID(): String? = repo.getUserID()
 
     fun onLoginButtonClicked() {
         clicked.value = true

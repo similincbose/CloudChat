@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.showDrawable
 import com.github.razir.progressbutton.showProgress
@@ -34,7 +35,6 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private lateinit var factory: LoginViewModelFactory
     private val viewModel by viewModels<LoginViewModel>({ this }, { factory })
     private lateinit var auth: FirebaseAuth
-    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
     override fun onCreateView(
@@ -48,8 +48,16 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         bindProgressButton(binding.btnLogin)
         bindProgressButton(binding.btnVerify)
         auth = FirebaseAuth.getInstance()
-        setFirebaseCallBack();
+        viewModel.uid = auth.currentUser?.uid
+        setFirebaseCallBack()
+        checkUserLogin()
         return binding.root
+    }
+
+    private fun checkUserLogin() {
+        if (viewModel.uid.equals(viewModel.getUserID())) {
+            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,6 +92,15 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 } else {
                     Toast.makeText(context, "Invalid Code", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+        binding.tvResend.setOnClickListener {
+            slideDown(it)
+            viewModel.phoneNumber?.let { phone ->
+                resendVerificationCode(
+                    phone,
+                    viewModel._resendToken
+                )
             }
         }
     }
@@ -138,7 +155,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 viewModel.storedVerificationId = verificationId
                 viewModel.startTimer(TIME_IN_MILLI_SECONDS)
                 updateTimer();
-                resendToken = token
+                viewModel._resendToken = token
             }
         }
     }
@@ -184,6 +201,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 if (task.isSuccessful) {
                     val user = task.result?.user
                     if (user != null) {
+                        viewModel.saveUserID(user.uid)
                         val animatedDrawable =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_tick)
                         animatedDrawable?.setBounds(0, 0, 40, 40)
@@ -194,12 +212,27 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                         }
                         Toast.makeText(context, "Success", Toast.LENGTH_SHORT)
                             .show()
+                        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
                     }
                 } else {
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                     }
                 }
             }
+    }
+
+    private fun resendVerificationCode(
+        phoneNumber: String,
+        token: PhoneAuthProvider.ForceResendingToken?
+    ) {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+            "+" + viewModel.getCountryCode() + "" + phoneNumber,
+            60,
+            TimeUnit.SECONDS,
+            requireActivity(),
+            callbacks,
+            token
+        )
     }
 
     companion object {
