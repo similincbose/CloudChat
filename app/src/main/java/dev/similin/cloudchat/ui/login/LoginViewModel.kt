@@ -2,6 +2,7 @@ package dev.similin.cloudchat.ui.login
 
 import android.os.CountDownTimer
 import android.text.format.DateUtils
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -19,14 +20,15 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
     val currentTime = Transformations.map(time_in_milli_seconds) { time ->
         DateUtils.formatElapsedTime(time)
     }
-
     fun saveCountryCode(countryCode: String) = repo.saveCountryCode(countryCode)
 
     fun getCountryCode(): String? = repo.getCountryCode()
 
-    fun saveUserID(uid: String) = repo.saveUserID(uid)
+    fun saveUserID(userId: String) = repo.saveUserID(userId)
 
     fun getUserID(): String? = repo.getUserID()
+
+    fun saveUserPhoneNumber(phone: String) = repo.saveUserPhoneNumber(phone)
 
     fun onLoginButtonClicked() {
         clicked.value = true
@@ -43,6 +45,10 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
             }
         }
         countDownTimer.start()
+    }
+
+    fun doneClick(){
+        clicked.value=false
     }
 
     companion object {

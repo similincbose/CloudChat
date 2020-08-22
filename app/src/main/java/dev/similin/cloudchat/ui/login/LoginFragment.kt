@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.showDrawable
@@ -42,6 +41,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLoginBinding.inflate(layoutInflater)
+        binding.lifecycleOwner = viewLifecycleOwner
         val repository = (activity?.application as CloudChatApplication).getLoginRepository()
         factory = LoginViewModelFactory(repository)
         binding.viewModel = viewModel
@@ -50,15 +50,9 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         auth = FirebaseAuth.getInstance()
         viewModel.uid = auth.currentUser?.uid
         setFirebaseCallBack()
-        checkUserLogin()
         return binding.root
     }
 
-    private fun checkUserLogin() {
-        if (viewModel.uid.equals(viewModel.getUserID())) {
-            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -96,11 +90,8 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         }
         binding.tvResend.setOnClickListener {
             slideDown(it)
-            viewModel.phoneNumber?.let { phone ->
-                resendVerificationCode(
-                    phone,
-                    viewModel._resendToken
-                )
+            viewModel.phoneNumber?.let {
+                resendVerificationCode()
             }
         }
     }
@@ -154,14 +145,14 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 updateUI()
                 viewModel.storedVerificationId = verificationId
                 viewModel.startTimer(TIME_IN_MILLI_SECONDS)
-                updateTimer();
+                updateTimer()
                 viewModel._resendToken = token
             }
         }
     }
 
     private fun updateTimer() {
-        viewModel.currentTime.observe(viewLifecycleOwner, Observer {
+        viewModel.currentTime.observe(viewLifecycleOwner, {
             it?.let { time ->
                 when (time) {
                     "00:00" -> {
@@ -202,6 +193,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                     val user = task.result?.user
                     if (user != null) {
                         viewModel.saveUserID(user.uid)
+                        viewModel.phoneNumber?.let { viewModel.saveUserPhoneNumber(it) }
                         val animatedDrawable =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_tick)
                         animatedDrawable?.setBounds(0, 0, 40, 40)
@@ -221,17 +213,14 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
             }
     }
 
-    private fun resendVerificationCode(
-        phoneNumber: String,
-        token: PhoneAuthProvider.ForceResendingToken?
-    ) {
+    private fun resendVerificationCode() {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-            "+" + viewModel.getCountryCode() + "" + phoneNumber,
+            "+" + viewModel.getCountryCode() + "" + viewModel.phoneNumber,
             60,
             TimeUnit.SECONDS,
             requireActivity(),
             callbacks,
-            token
+            viewModel._resendToken
         )
     }
 

@@ -14,10 +14,7 @@
         <item name="colorSurface">@color/surfaceColor</item>
 
         <item name="android:fontFamily">@font/my_custom_font</item>
+        <item name="android:homeAsUpIndicator">@color/secondaryTextColor</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
 </resources>

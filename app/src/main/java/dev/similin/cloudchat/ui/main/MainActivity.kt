@@ -2,6 +2,7 @@ package dev.similin.cloudchat.ui.main
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -9,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+//        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setupNavigationItems()
     }
 
@@ -25,12 +28,14 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.my_nav_host_fragment)
         setSupportActionBar(binding.mainToolbar)
         val appBarConfiguration =
-            AppBarConfiguration.Builder(R.id.splashFragment, R.id.loginFragment).build()
+            AppBarConfiguration.Builder(R.id.splashFragment, R.id.loginFragment, R.id.homeFragment)
+                .build()
         binding.mainToolbar.setupWithNavController(navController, appBarConfiguration)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.splashFragment -> setViewsGone()
                 R.id.loginFragment -> setViewsGone()
+                R.id.homeFragment -> setViewsVisible()
             }
         }
     }

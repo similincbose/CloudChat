@@ -18,4 +18,12 @@ class LoginRepository(private val prefs: ChatPreference) {
     fun getUserID(): String? {
         return prefs.getUserID()
     }
+
+    fun saveUserPhoneNumber(phone: String) {
+        prefs.saveUserPhoneNumber(phone)
+    }
+
+    fun getUserPhoneNumber(): String? {
+        return prefs.getUserPhoneNumber()
+    }
 }

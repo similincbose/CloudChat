@@ -10,10 +10,7 @@
     <color name="secondaryColor">#546e7a</color>
     <color name="secondaryLightColor">#819ca9</color>
     <color name="secondaryDarkColor">#29434e</color>
-    <color name="primaryTextColor">#000000</color>
+    <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
     <color name="surfaceColor">#ffffff</color>
-
-
-
 </resources>
