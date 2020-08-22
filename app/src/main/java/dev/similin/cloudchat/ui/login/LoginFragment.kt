@@ -2,6 +2,7 @@ package dev.similin.cloudchat.ui.login
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -154,6 +155,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun updateTimer() {
         viewModel.currentTime.observe(viewLifecycleOwner, {
             it?.let { time ->
+                Log.d(TAG, "time$time")
                 when (time) {
                     "00:00" -> {
                         binding.tvResendOtp.visibility = View.GONE

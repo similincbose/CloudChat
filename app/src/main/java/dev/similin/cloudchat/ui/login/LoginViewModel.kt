@@ -26,8 +26,6 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
 
     fun saveUserID(userId: String) = repo.saveUserID(userId)
 
-    fun getUserID(): String? = repo.getUserID()
-
     fun saveUserPhoneNumber(phone: String) = repo.saveUserPhoneNumber(phone)
 
     fun onLoginButtonClicked() {
@@ -45,10 +43,6 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
             }
         }
         countDownTimer.start()
-    }
-
-    fun doneClick(){
-        clicked.value=false
     }
 
     companion object {

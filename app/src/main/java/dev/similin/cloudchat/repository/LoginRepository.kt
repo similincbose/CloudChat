@@ -1,8 +1,9 @@
 package dev.similin.cloudchat.repository
 
+import dev.similin.cloudchat.network.ChatApi
 import dev.similin.cloudchat.preference.ChatPreference
 
-class LoginRepository(private val prefs: ChatPreference) {
+class LoginRepository(private val prefs: ChatPreference, private val api: ChatApi) {
     fun saveCountryCode(countryCode: String) {
         prefs.saveCountryCode(countryCode)
     }
@@ -26,4 +27,6 @@ class LoginRepository(private val prefs: ChatPreference) {
     fun getUserPhoneNumber(): String? {
         return prefs.getUserPhoneNumber()
     }
+
+    suspend fun fetchUsers() = api.getUsers()
 }
