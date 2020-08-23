@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.splashFragment -> setViewsGone()
                 R.id.loginFragment -> setViewsGone()
                 R.id.homeFragment -> setViewsVisible()
+                R.id.settingsFragment -> setViewsVisible()
             }
         }
     }

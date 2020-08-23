@@ -51,9 +51,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     //firebase
-    implementation 'com.google.firebase:firebase-analytics:17.5.0'
-    implementation 'com.google.firebase:firebase-auth:19.3.2'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    implementation 'com.google.firebase:firebase-analytics-ktx:17.5.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:19.3.2'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:17.2.1'
+    implementation 'com.google.firebase:firebase-database-ktx:19.3.1'
 
     //navigation
     implementation"android.arch.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -85,4 +86,7 @@ dependencies {
 
     //Logging - Timber
     implementation "com.jakewharton.timber:timber:4.7.1"
+
+    //alert dialog
+    implementation 'com.github.f0ris.sweetalert:library:1.6.2'
 }

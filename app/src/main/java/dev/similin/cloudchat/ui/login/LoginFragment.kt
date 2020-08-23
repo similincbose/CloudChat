@@ -24,8 +24,10 @@ import com.hbb20.CountryCodePicker
 import dev.similin.cloudchat.CloudChatApplication
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentLoginBinding
+import dev.similin.cloudchat.network.Status
 import dev.similin.cloudchat.util.slideDown
 import dev.similin.cloudchat.util.slideUp
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -61,6 +63,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
         viewModel.saveCountryCode("91")
         binding.edtPhoneNumber.requestFocus()
         setListenerMethods()
+        getUsers();
     }
 
 
@@ -147,7 +150,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                 viewModel.storedVerificationId = verificationId
                 viewModel.startTimer(TIME_IN_MILLI_SECONDS)
                 updateTimer()
-                viewModel._resendToken = token
+                viewModel.resendingToken = token
             }
         }
     }
@@ -204,9 +207,9 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                                 buttonTextRes = R.string.verified
                             }
                         }
+                        getUsers()
                         Toast.makeText(context, "Success", Toast.LENGTH_SHORT)
                             .show()
-                        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
                     }
                 } else {
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
@@ -222,8 +225,27 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
             TimeUnit.SECONDS,
             requireActivity(),
             callbacks,
-            viewModel._resendToken
+            viewModel.resendingToken
         )
+    }
+
+    private fun getUsers() {
+        viewModel.fetchUsers().observe(viewLifecycleOwner, {
+            it?.let { resource ->
+                when (resource.status) {
+                    Status.Success -> {
+                    }
+                    Status.Loading -> {
+                        Timber.d("Loading")
+                    }
+                    Status.Error -> {
+                        viewModel.writeNewUser()
+                        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
+                    }
+                }
+            }
+        })
+
     }
 
     companion object {
