@@ -2,7 +2,6 @@ package dev.similin.cloudchat.ui.login
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.github.razir.progressbutton.bindProgressButton
+import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showDrawable
 import com.github.razir.progressbutton.showProgress
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -134,6 +136,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
 
             override fun onVerificationFailed(e: FirebaseException) {
                 viewModel.verificationInProgress = false
+                changeButton(R.drawable.ic_next, R.string.cntnue, binding.btnLogin)
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     Toast.makeText(context, "Invalid phone number", Toast.LENGTH_SHORT).show()
                 } else if (e is FirebaseTooManyRequestsException) {
@@ -158,7 +161,6 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun updateTimer() {
         viewModel.currentTime.observe(viewLifecycleOwner, {
             it?.let { time ->
-                Log.d(TAG, "time$time")
                 when (time) {
                     "00:00" -> {
                         binding.tvResendOtp.visibility = View.GONE
@@ -167,7 +169,6 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                     }
                     else -> binding.tvTimerResend.text = time
                 }
-
             }
         })
     }
@@ -175,14 +176,13 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     private fun startPhoneNumberVerification() {
         viewModel.phoneNumber?.let {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                "+" + viewModel.getCountryCode() + "" + it,
+                "+${viewModel.getCountryCode()}${it}",
                 60,
                 TimeUnit.SECONDS,
                 requireActivity(),
                 callbacks
             )
         }
-
         viewModel.verificationInProgress = true
     }
 
@@ -199,19 +199,13 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
                     if (user != null) {
                         viewModel.saveUserID(user.uid)
                         viewModel.phoneNumber?.let { viewModel.saveUserPhoneNumber(it) }
-                        val animatedDrawable =
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_tick)
-                        animatedDrawable?.setBounds(0, 0, 40, 40)
-                        if (animatedDrawable != null) {
-                            binding.btnVerify.showDrawable(animatedDrawable) {
-                                buttonTextRes = R.string.verified
-                            }
-                        }
+                        changeButton(R.drawable.ic_tick, R.string.verified, binding.btnVerify)
                         getUsers()
                         Toast.makeText(context, "Success", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } else {
+                    binding.btnVerify.hideProgress("Verify")
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                     }
                 }
@@ -220,7 +214,7 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
 
     private fun resendVerificationCode() {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-            "+" + viewModel.getCountryCode() + "" + viewModel.phoneNumber,
+            "+${viewModel.getCountryCode()}${viewModel.phoneNumber}",
             60,
             TimeUnit.SECONDS,
             requireActivity(),
@@ -234,18 +228,60 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
             it?.let { resource ->
                 when (resource.status) {
                     Status.Success -> {
+                        resource.data?.body()?.let { data ->
+                            viewModel.checkUser(data)
+                        }
+                        when (viewModel.found) {
+                            true -> welcomebackMsg()
+                            else -> {
+                                viewModel.writeNewUser()
+                                loginSuccess()
+                            }
+                        }
                     }
                     Status.Loading -> {
                         Timber.d("Loading")
                     }
                     Status.Error -> {
-                        viewModel.writeNewUser()
-                        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
+                        Toast.makeText(
+                            context,
+                            "There was an error fetching data. Please check your internet connection. App needs to be run once to cache data.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         })
 
+    }
+
+    private fun loginSuccess() {
+        if (viewModel.flag!!) {
+            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
+        }
+    }
+
+    private fun welcomebackMsg() {
+        SweetAlertDialog(requireContext(), SweetAlertDialog.NORMAL_TYPE)
+            .setTitleText("Welcome Back")
+            .setConfirmText("Continue")
+            .setConfirmClickListener { sDialog ->
+                sDialog.dismissWithAnimation()
+                viewModel.flag = true
+                loginSuccess()
+            }
+            .show()
+    }
+
+    private fun changeButton(drawable: Int, msg: Int, btn: MaterialButton) {
+        val animatedDrawable =
+            ContextCompat.getDrawable(requireContext(), drawable)
+        animatedDrawable?.setBounds(0, 0, 40, 40)
+        if (animatedDrawable != null) {
+            btn.showDrawable(animatedDrawable) {
+                buttonTextRes = msg
+            }
+        }
     }
 
     companion object {

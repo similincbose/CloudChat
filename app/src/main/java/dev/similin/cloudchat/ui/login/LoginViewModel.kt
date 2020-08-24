@@ -9,25 +9,28 @@ import androidx.lifecycle.liveData
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import dev.similin.cloudchat.model.UserResponseApi
 import dev.similin.cloudchat.network.Resource
 import dev.similin.cloudchat.repository.LoginRepository
 import timber.log.Timber
 
 class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
     var phoneNumber: String? = null
-    var username: String? = null
-    var about: String? = null
-    var imageUrl: String? = null
+    var username: String? = ""
+    var about: String? = ""
+    var imageUrl: String? = "https://cdn.onlinewebfonts.com/svg/img_568657.png"
     var uid: String? = null
     val clicked = MutableLiveData<Boolean>()
-    var timeInMilliSeconds = MutableLiveData<Long>()
+    val timeInMilliSeconds = MutableLiveData<Long>()
+    var found :Boolean?=false
     var verificationInProgress = false
     var storedVerificationId: String? = null
+    var flag: Boolean? = false
     var resendingToken: PhoneAuthProvider.ForceResendingToken? = null
     val currentTime = Transformations.map(timeInMilliSeconds) { time ->
         DateUtils.formatElapsedTime(time)
     }
-    val reference = Firebase.database.reference
+    private val reference = Firebase.database.reference
 
     fun saveCountryCode(countryCode: String) = repo.saveCountryCode(countryCode)
 
@@ -37,12 +40,17 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
 
     fun saveUserPhoneNumber(phone: String) = repo.saveUserPhoneNumber(phone)
 
+    init {
+        val user = UserResponseApi.Users("", "", "")
+        reference.child("users").child("users").child("dummy").setValue(user)
+    }
+
     fun onLoginButtonClicked() {
         clicked.value = true
     }
 
     fun startTimer(seconds: Long) {
-        var countDownTimer: CountDownTimer = object : CountDownTimer(seconds, ONE_SECOND) {
+        val countDownTimer: CountDownTimer = object : CountDownTimer(seconds, ONE_SECOND) {
             override fun onTick(p0: Long) {
                 timeInMilliSeconds.value = p0 / ONE_SECOND
             }
@@ -65,12 +73,25 @@ class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
         }
     }
 
-    fun writeNewUser() {
+    fun writeNewUser(): Boolean? {
         phoneNumber?.let {
-            reference.child(it).child("username").setValue(username)
-            reference.child(it).child("phoneNumber").setValue(phoneNumber)
-            reference.child(it).child("about").setValue(about)
-            reference.child(it).child("imageUrl").setValue(imageUrl)
+            val user = UserResponseApi.Users(username, about, imageUrl)
+            reference.child("users").child("users").child("+" + getCountryCode() + it)
+                .setValue(user)
+            flag = true
+        }
+        return flag
+    }
+
+    fun checkUser(data: UserResponseApi.UserResponse) {
+        val users: Map<String, UserResponseApi.Users>? = data.users
+        if (users != null) {
+            for (user in users) {
+                if (("+${getCountryCode()}${phoneNumber}") == user.key) {
+                    found = true
+                    return
+                }
+            }
         }
     }
 
