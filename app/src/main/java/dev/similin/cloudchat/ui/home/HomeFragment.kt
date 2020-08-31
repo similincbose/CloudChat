@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentHomeBinding
+import dev.similin.cloudchat.ui.login.LoginFragmentDirections
 import dev.similin.cloudchat.ui.main.MainActivity
 
 class HomeFragment : Fragment() {
@@ -19,6 +21,9 @@ class HomeFragment : Fragment() {
     ): View? {
         binding = FragmentHomeBinding.inflate(layoutInflater)
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.fabContactList.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToContactsFragment())
+        }
         return binding.root
     }
 

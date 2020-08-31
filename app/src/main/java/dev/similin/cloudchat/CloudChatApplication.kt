@@ -4,6 +4,7 @@ import android.app.Application
 import dev.similin.cloudchat.network.ChatApi
 import dev.similin.cloudchat.network.RetrofitClient
 import dev.similin.cloudchat.preference.ChatPreference
+import dev.similin.cloudchat.repository.ContactRepository
 import dev.similin.cloudchat.repository.LoginRepository
 import dev.similin.cloudchat.repository.SplashRepository
 import timber.log.Timber
@@ -28,5 +29,9 @@ class CloudChatApplication : Application() {
 
     fun getSplashRepository(): SplashRepository {
         return SplashRepository(getPreference())
+    }
+
+    fun getContactsRepository():ContactRepository{
+        return  ContactRepository()
     }
 }

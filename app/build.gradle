@@ -89,4 +89,7 @@ dependencies {
 
     //alert dialog
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+
+    //RecyclerView
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
 }

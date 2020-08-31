@@ -63,6 +63,11 @@
             app:destination="@id/settingsFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment"
+            app:popUpTo="@id/navigation"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment"
@@ -84,4 +89,9 @@
             app:popUpTo="@id/navigation"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="dev.similin.cloudchat.ui.contacts.ContactsFragment"
+        android:label="Select Contact"
+        tools:layout="@layout/fragment_contacts" />
 </navigation>
