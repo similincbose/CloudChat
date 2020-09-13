@@ -2,6 +2,7 @@ package dev.similin.cloudchat.ui.login
 
 import android.os.CountDownTimer
 import android.text.format.DateUtils
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -14,7 +15,7 @@ import dev.similin.cloudchat.network.Resource
 import dev.similin.cloudchat.repository.LoginRepository
 import timber.log.Timber
 
-class LoginViewModel(private val repo: LoginRepository) : ViewModel() {
+class LoginViewModel @ViewModelInject constructor(private val repo: LoginRepository) : ViewModel() {
     var phoneNumber: String? = null
     var username: String? = ""
     var about: String? = ""

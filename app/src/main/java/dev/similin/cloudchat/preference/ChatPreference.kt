@@ -1,13 +1,14 @@
 package dev.similin.cloudchat.preference
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import dev.similin.cloudchat.util.COUNTRY_CODE
 import dev.similin.cloudchat.util.UID
 import dev.similin.cloudchat.util.USER_PHONE
+import javax.inject.Inject
 
-class ChatPreference(context: Context) {
-    private val preference = context.getSharedPreferences("ChatPrefs", Context.MODE_PRIVATE)
+class ChatPreference @Inject constructor(private val preference: SharedPreferences) {
 
     fun saveCountryCode(code: String) {
         preference.edit { putString(COUNTRY_CODE, code) }

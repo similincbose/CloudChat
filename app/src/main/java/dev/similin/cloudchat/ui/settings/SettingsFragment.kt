@@ -6,11 +6,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentSettingsBinding
 import dev.similin.cloudchat.ui.main.MainActivity
 
-
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var auth: FirebaseAuth

@@ -2,8 +2,11 @@ package dev.similin.cloudchat.repository
 
 import dev.similin.cloudchat.network.ChatApi
 import dev.similin.cloudchat.preference.ChatPreference
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LoginRepository(private val prefs: ChatPreference, private val api: ChatApi) {
+@Singleton
+class LoginRepository @Inject constructor(private val prefs: ChatPreference, private val api: ChatApi) {
     fun saveCountryCode(countryCode: String) {
         prefs.saveCountryCode(countryCode)
     }

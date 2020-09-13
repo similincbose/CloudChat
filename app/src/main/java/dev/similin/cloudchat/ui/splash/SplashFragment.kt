@@ -9,15 +9,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.CloudChatApplication
 import dev.similin.cloudchat.databinding.FragmentSplashBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
-    private lateinit var factory: SplashViewModelFactory
-    private val viewModel by viewModels<SplashViewModel>({ this }, { factory })
+    private val viewModel by viewModels<SplashViewModel>({ this })
     private lateinit var auth: FirebaseAuth
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,8 +26,6 @@ class SplashFragment : Fragment() {
     ): View? {
         binding = FragmentSplashBinding.inflate(layoutInflater)
         binding.lifecycleOwner = viewLifecycleOwner
-        val repository = (activity?.application as CloudChatApplication).getSplashRepository()
-        factory = SplashViewModelFactory(repository)
         auth = FirebaseAuth.getInstance()
         viewModel.uid = auth.currentUser?.uid
         lifecycleScope.launch {

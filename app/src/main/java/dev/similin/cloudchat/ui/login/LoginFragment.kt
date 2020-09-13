@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.hbb20.CountryCodePicker
+import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.CloudChatApplication
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentLoginBinding
@@ -32,12 +33,11 @@ import dev.similin.cloudchat.util.slideUp
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-
+@AndroidEntryPoint
 class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
 
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var factory: LoginViewModelFactory
-    private val viewModel by viewModels<LoginViewModel>({ this }, { factory })
+    private val viewModel by viewModels<LoginViewModel>({ this })
     private lateinit var auth: FirebaseAuth
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
@@ -47,8 +47,6 @@ class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
     ): View? {
         binding = FragmentLoginBinding.inflate(layoutInflater)
         binding.lifecycleOwner = viewLifecycleOwner
-        val repository = (activity?.application as CloudChatApplication).getLoginRepository()
-        factory = LoginViewModelFactory(repository)
         binding.viewModel = viewModel
         bindProgressButton(binding.btnLogin)
         bindProgressButton(binding.btnVerify)

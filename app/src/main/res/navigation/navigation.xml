@@ -67,7 +67,7 @@
             android:id="@+id/action_homeFragment_to_contactsFragment"
             app:destination="@id/contactsFragment"
             app:popUpTo="@id/navigation"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment"

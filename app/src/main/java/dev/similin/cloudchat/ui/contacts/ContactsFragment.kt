@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,23 +14,27 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.CloudChatApplication
 import dev.similin.cloudchat.databinding.FragmentContactsBinding
+import dev.similin.cloudchat.model.UserResponseApi
+import dev.similin.cloudchat.network.Status
+import timber.log.Timber
 
-
+@AndroidEntryPoint
 class ContactsFragment : Fragment() {
     private lateinit var binding: FragmentContactsBinding
-    private lateinit var factory: ContactsViewModelFactory
-    private val viewModel by viewModels<ContactsViewModel>({ this }, { factory })
+    private val viewModel by viewModels<ContactsViewModel>({ this })
+    private lateinit var auth: FirebaseAuth
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentContactsBinding.inflate(layoutInflater)
         binding.lifecycleOwner = viewLifecycleOwner
-        val repository = (activity?.application as CloudChatApplication).getContactsRepository()
-        factory = ContactsViewModelFactory(repository)
         binding.viewModel = viewModel
+        auth = FirebaseAuth.getInstance()
         return binding.root
     }
 
@@ -39,6 +44,9 @@ class ContactsFragment : Fragment() {
     }
 
     private fun setupContactList() {
+        viewModel.contacts.distinctBy {
+            it.contactNumber
+        }
         val adapter = ContactsRecyclerAdapter()
         binding.rvContactList.adapter = adapter
         adapter.setList(viewModel.contacts)
@@ -76,58 +84,73 @@ class ContactsFragment : Fragment() {
     }
 
     private fun getContacts() {
-        val builder = StringBuilder()
-        val resolver: ContentResolver = requireContext().contentResolver;
-        val cursor = resolver.query(
-            ContactsContract.Contacts.CONTENT_URI, null, null, null,
-            ContactsContract.Contacts.DISPLAY_NAME + " ASC"
+
+        val projection = arrayOf(
+            Phone._ID,
+            Phone.DISPLAY_NAME,
+            Phone.NUMBER
         )
 
-        if (cursor != null) {
-            if (cursor.count > 0) {
-                while (cursor.moveToNext()) {
-                    val id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
-                    val name =
-                        cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                    val phoneNumber = (cursor.getString(
-                        cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)
-                    )).toInt()
+        val cr: ContentResolver = requireContext().contentResolver
 
-                    if (phoneNumber > 0) {
-                        val cursorPhone = requireContext().contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
-                            arrayOf(id),
-                            null
-                        )
+        cr.query(
+            Phone.CONTENT_URI,
+            projection,
+            null,
+            null,
+            Phone.DISPLAY_NAME + " ASC"
+        )?.use { cursor ->
+            val contactIdIndex =
+                cursor.getColumnIndex(Phone._ID)
+            val displayNameIndex =
+                cursor.getColumnIndex(Phone.DISPLAY_NAME)
+            val phoneNumber =
+                cursor.getColumnIndex(Phone.NUMBER)
+            var contactId: Long? = null
+            var displayName: String
+            var address: String
+            while (cursor.moveToNext()) {
+                contactId = cursor.getLong(contactIdIndex);
+                displayName = cursor.getString(displayNameIndex);
+                address = cursor.getString(phoneNumber);
+                viewModel.contacts.add(
+                    ContactsModel(
+                        address, displayName
+                    )
+                )
+            }
+            setupContactList()
+        }
+    }
 
-                        if (cursorPhone != null) {
-                            if (cursorPhone.count > 0) {
-                                while (cursorPhone.moveToNext()) {
-                                    val phoneNumValue = cursorPhone.getString(
-                                        cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                                    )
-                                    builder.append("Contact: ").append(name)
-                                        .append(", Phone Number: ").append(
-                                            phoneNumValue
-                                        ).append("\n\n")
-                                    viewModel.contacts.add(
-                                        ContactsModel(
-                                            phoneNumValue, name
-                                        )
-                                    )
+    private fun getUsers() {
+        viewModel.fetchUsers().observe(viewLifecycleOwner, {
+            it?.let { resource ->
+                when (resource.status) {
+                    Status.Success -> {
+                        resource.data?.body()?.let { data ->
+                            val users: Map<String, UserResponseApi.Users>? = data.users
+                            if (users != null) {
+                                for (user in users) {
+
                                 }
-                                setupContactList()
                             }
                         }
-                        cursorPhone?.close()
+                    }
+                    Status.Loading -> {
+                        Timber.d("Loading")
+                    }
+                    Status.Error -> {
+                        Toast.makeText(
+                            context,
+                            "There was an error fetching data. Please check your internet connection. App needs to be run once to cache data.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-            } else {
             }
-        }
-        cursor?.close()
+        })
+
     }
 
 
