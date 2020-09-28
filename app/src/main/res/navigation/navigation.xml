@@ -9,7 +9,7 @@
         android:id="@+id/splashFragment"
         android:name="dev.similin.cloudchat.ui.splash.SplashFragment"
         android:label="fragment_splash"
-        tools:layout="@layout/fragment_splash" >
+        tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/loginFragment"
@@ -33,7 +33,7 @@
         android:id="@+id/loginFragment"
         android:name="dev.similin.cloudchat.ui.login.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment"
@@ -48,7 +48,7 @@
         android:id="@+id/homeFragment"
         android:name="dev.similin.cloudchat.ui.home.HomeFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_aboutFragment"
             app:destination="@id/aboutFragment"
@@ -65,9 +65,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_homeFragment_to_contactsFragment"
-            app:destination="@id/contactsFragment"
-            app:popUpTo="@id/navigation"
-            app:popUpToInclusive="false" />
+            app:destination="@id/contactsFragment" />
     </fragment>
     <fragment
         android:id="@+id/aboutFragment"
@@ -78,7 +76,7 @@
         android:id="@+id/settingsFragment"
         android:name="dev.similin.cloudchat.ui.settings.SettingsFragment"
         android:label="Settings"
-        tools:layout="@layout/fragment_settings" >
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment_to_loginFragment"
             app:destination="@id/loginFragment"

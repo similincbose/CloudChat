@@ -9,7 +9,6 @@ import androidx.navigation.ui.NavigationUI
 import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentHomeBinding
-import dev.similin.cloudchat.ui.login.LoginFragmentDirections
 import dev.similin.cloudchat.ui.main.MainActivity
 
 @AndroidEntryPoint

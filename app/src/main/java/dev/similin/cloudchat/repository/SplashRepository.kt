@@ -1,6 +1,5 @@
 package dev.similin.cloudchat.repository
 
-import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.preference.ChatPreference
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -3,10 +3,8 @@ package dev.similin.cloudchat.repository
 import dev.similin.cloudchat.network.ChatApi
 import dev.similin.cloudchat.preference.ChatPreference
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LoginRepository @Inject constructor(
+class UserRepository @Inject constructor(
     private val prefs: ChatPreference,
     private val api: ChatApi
 ) {
@@ -35,4 +33,6 @@ class LoginRepository @Inject constructor(
     }
 
     suspend fun fetchUsers() = api.getUsers()
+
+
 }

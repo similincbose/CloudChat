@@ -5,7 +5,6 @@ import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +15,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import dev.similin.cloudchat.CloudChatApplication
+import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentContactsBinding
-import dev.similin.cloudchat.model.UserResponseApi
 import dev.similin.cloudchat.network.Status
+import dev.similin.cloudchat.ui.main.MainActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -27,6 +26,7 @@ class ContactsFragment : Fragment() {
     private lateinit var binding: FragmentContactsBinding
     private val viewModel by viewModels<ContactsViewModel>({ this })
     private lateinit var auth: FirebaseAuth
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,6 +35,8 @@ class ContactsFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         auth = FirebaseAuth.getInstance()
+        (activity as MainActivity).supportActionBar?.title = "Select Contact"
+        setupRecyclerView()
         return binding.root
     }
 
@@ -43,14 +45,17 @@ class ContactsFragment : Fragment() {
         loadContacts()
     }
 
-    private fun setupContactList() {
-        viewModel.contacts.distinctBy {
-            it.contactNumber
+    private fun setupRecyclerView() {
+        val adapter = ContactsRecyclerAdapter {
+            Toast.makeText(requireContext(), "${it.contactName}", Toast.LENGTH_SHORT).show()
         }
-        val adapter = ContactsRecyclerAdapter()
         binding.rvContactList.adapter = adapter
-        adapter.setList(viewModel.contacts)
+        viewModel.contactList.observe(viewLifecycleOwner){
+            val orderedContactList = it.distinct()
+            adapter.setList(orderedContactList)
+        }
     }
+
 
     private fun loadContacts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
@@ -110,16 +115,16 @@ class ContactsFragment : Fragment() {
             var displayName: String
             var address: String
             while (cursor.moveToNext()) {
-                contactId = cursor.getLong(contactIdIndex);
-                displayName = cursor.getString(displayNameIndex);
-                address = cursor.getString(phoneNumber);
+                contactId = cursor.getLong(contactIdIndex)
+                displayName = cursor.getString(displayNameIndex)
+                address = cursor.getString(phoneNumber)
                 viewModel.contacts.add(
                     ContactsModel(
                         address, displayName
                     )
                 )
             }
-            setupContactList()
+            getUsers()
         }
     }
 
@@ -128,14 +133,7 @@ class ContactsFragment : Fragment() {
             it?.let { resource ->
                 when (resource.status) {
                     Status.Success -> {
-                        resource.data?.body()?.let { data ->
-                            val users: Map<String, UserResponseApi.Users>? = data.users
-                            if (users != null) {
-                                for (user in users) {
-
-                                }
-                            }
-                        }
+                        // TODO: Ivde aa kopu hide akukaa.. karangunna kuntham
                     }
                     Status.Loading -> {
                         Timber.d("Loading")
@@ -150,9 +148,7 @@ class ContactsFragment : Fragment() {
                 }
             }
         })
-
     }
-
 
     companion object {
         const val PERMISSIONS_REQUEST_READ_CONTACTS = 100

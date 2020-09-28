@@ -15,10 +15,10 @@ data class Resource<out T>(val status: Status, val data: T?, val message: String
                 message = null
             )
 
-        fun <T> error(message: String): Resource<T> =
+        fun <T> error(message: String,data:T?=null): Resource<T> =
             Resource(
                 status = Status.Error,
-                data = null,
+                data = data,
                 message = message
             )
 

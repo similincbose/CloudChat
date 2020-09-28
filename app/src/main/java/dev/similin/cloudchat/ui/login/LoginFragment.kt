@@ -24,7 +24,6 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.hbb20.CountryCodePicker
 import dagger.hilt.android.AndroidEntryPoint
-import dev.similin.cloudchat.CloudChatApplication
 import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentLoginBinding
 import dev.similin.cloudchat.network.Status

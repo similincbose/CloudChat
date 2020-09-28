@@ -2,11 +2,11 @@ package dev.similin.cloudchat.model
 
 import com.google.gson.annotations.SerializedName
 
-class UserResponseApi{
+class UserResponseApi {
 
-    data class UserResponse (
+    data class UserResponse(
         @SerializedName("users")
-        val users: Map<String,Users>?
+        val users: Map<String, Users>?
     )
 
     data class Users(

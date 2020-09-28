@@ -4,7 +4,7 @@
     package="dev.similin.cloudchat">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:name=".CloudChatApplication"
@@ -17,8 +17,7 @@
         android:windowSoftInputMode="stateVisible"
         tools:replace="android:allowBackup,android:windowSoftInputMode,android:usesCleartextTraffic"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ui.main.MainActivity">
+        <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

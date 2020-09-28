@@ -1,6 +1,5 @@
 package dev.similin.cloudchat.preference
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import dev.similin.cloudchat.util.COUNTRY_CODE
@@ -26,7 +25,7 @@ class ChatPreference @Inject constructor(private val preference: SharedPreferenc
         return preference.getString(UID, "")
     }
 
-    fun saveUserPhoneNumber(phone:String){
+    fun saveUserPhoneNumber(phone: String) {
         preference.edit { putString(USER_PHONE, phone) }
     }
 

@@ -23,7 +23,7 @@ class LoginViewModel @ViewModelInject constructor(private val repo: LoginReposit
     var uid: String? = null
     val clicked = MutableLiveData<Boolean>()
     val timeInMilliSeconds = MutableLiveData<Long>()
-    var found :Boolean?=false
+    var found: Boolean? = false
     var verificationInProgress = false
     var storedVerificationId: String? = null
     var flag: Boolean? = false
@@ -70,7 +70,7 @@ class LoginViewModel @ViewModelInject constructor(private val repo: LoginReposit
             emit(Resource.success(response))
         } catch (e: Exception) {
             Timber.e(e)
-            emit(Resource.error(e.message ?: "Error Occurred"))
+            emit(Resource.error(e.message ?: "Error Occurred",null))
         }
     }
 

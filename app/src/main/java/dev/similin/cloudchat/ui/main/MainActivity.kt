@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.R
@@ -15,6 +16,7 @@ import dev.similin.cloudchat.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         setSupportActionBar(binding.mainToolbar)
-        val appBarConfiguration =
+        appBarConfiguration =
             AppBarConfiguration.Builder(R.id.splashFragment, R.id.loginFragment, R.id.homeFragment)
                 .build()
         binding.mainToolbar.setupWithNavController(navController, appBarConfiguration)
@@ -40,6 +42,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.settingsFragment -> setViewsVisible()
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp()
+                || super.onSupportNavigateUp()
     }
 
     private fun setViewsGone() {
