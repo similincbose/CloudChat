@@ -91,5 +91,20 @@
         android:id="@+id/contactsFragment"
         android:name="dev.similin.cloudchat.ui.contacts.ContactsFragment"
         android:label="Select Contact"
-        tools:layout="@layout/fragment_contacts" />
+        tools:layout="@layout/fragment_contacts" >
+        <action
+            android:id="@+id/action_contactsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="dev.similin.cloudchat.ui.chat.ChatFragment"
+        android:label="ChatFragment" >
+        <argument
+            android:name="number"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
 </navigation>

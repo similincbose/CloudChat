@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.R
@@ -47,7 +48,7 @@ class ContactsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val adapter = ContactsRecyclerAdapter {
-            Toast.makeText(requireContext(), "${it.contactName}", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(ContactsFragmentDirections.actionContactsFragmentToChatFragment(it.contactNumber.toString(),it.contactName.toString()))
         }
         binding.rvContactList.adapter = adapter
         viewModel.contactList.observe(viewLifecycleOwner){
