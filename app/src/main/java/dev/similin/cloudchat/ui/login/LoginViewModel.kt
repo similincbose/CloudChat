@@ -8,12 +8,16 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dev.similin.cloudchat.model.UserResponseApi
 import dev.similin.cloudchat.network.Resource
 import dev.similin.cloudchat.repository.LoginRepository
 import timber.log.Timber
+
 
 class LoginViewModel @ViewModelInject constructor(private val repo: LoginRepository) : ViewModel() {
     var phoneNumber: String? = null
@@ -70,7 +74,7 @@ class LoginViewModel @ViewModelInject constructor(private val repo: LoginReposit
             emit(Resource.success(response))
         } catch (e: Exception) {
             Timber.e(e)
-            emit(Resource.error(e.message ?: "Error Occurred",null))
+            emit(Resource.error(e.message ?: "Error Occurred", null))
         }
     }
 

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 class LoginFragment : Fragment(), CountryCodePicker.OnCountryChangeListener {
 
     private lateinit var binding: FragmentLoginBinding
-    private val viewModel by viewModels<LoginViewModel>({ this })
+    private val viewModel by viewModels<LoginViewModel>()
     private lateinit var auth: FirebaseAuth
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
