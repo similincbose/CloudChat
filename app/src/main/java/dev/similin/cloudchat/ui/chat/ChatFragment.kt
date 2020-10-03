@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import dev.similin.cloudchat.databinding.FragmentChatBinding
 import dev.similin.cloudchat.ui.main.MainActivity
+import timber.log.Timber
 
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
@@ -34,24 +35,47 @@ class ChatFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.title = args.name
         viewModel.chatWithUser = args.number
         viewModel.chatWithUserName = args.name
+        showChats()
         binding.sendButton.setOnClickListener {
-            showChats()
+            addChats()
         }
     }
 
-    private fun showChats() {
-        viewModel.addChatReference().observe(viewLifecycleOwner) {
+    private fun addChats() {
+        viewModel.addChatReference()
+        viewModel.mapChat.observe(viewLifecycleOwner) {
             it.let { map ->
                 val message = map?.get("message")?.toString()
-                val userName = map?.get("user")?.toString()
-                if (userName.equals(viewModel.getUserPhone())) {
-                    addMessageBox("You:-\n$message", 1);
-                } else {
-                    addMessageBox(viewModel.chatWithUserName + ":-\n" + message, 2);
+                when (val userName = map?.get("user")?.toString()) {
+                    viewModel.getUserPhone() -> addMessageBox("You:-\n$message", 1)
+                    viewModel.chatWithUser -> addMessageBox(
+                        viewModel.chatWithUserName + ":-\n" + message,
+                        2
+                    )
+                    else -> Timber.e(userName.toString())
                 }
             }
         }
     }
+
+    private fun showChats() {
+        viewModel.getChatReference()
+        viewModel.mapChat.observe(viewLifecycleOwner) {
+            it.let { map ->
+                Timber.e(map.toString())
+                val message = map?.get("message")
+                when (val userName = map?.get("user")) {
+                    viewModel.getUserPhone() -> addMessageBox("You:-\n$message", 1)
+                    viewModel.chatWithUser -> addMessageBox(
+                        viewModel.chatWithUserName + ":-\n" + message,
+                        2
+                    )
+                    else -> Timber.e(userName.toString())
+                }
+            }
+        }
+    }
+
 
     private fun addMessageBox(message: String?, type: Int) {
         val textView = TextView(requireContext())
