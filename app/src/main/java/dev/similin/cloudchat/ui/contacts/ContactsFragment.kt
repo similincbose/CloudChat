@@ -16,7 +16,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentContactsBinding
 import dev.similin.cloudchat.network.Status
 import dev.similin.cloudchat.ui.main.MainActivity
@@ -48,10 +47,15 @@ class ContactsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val adapter = ContactsRecyclerAdapter {
-            findNavController().navigate(ContactsFragmentDirections.actionContactsFragmentToChatFragment(it.contactNumber.toString(),it.contactName.toString()))
+            findNavController().navigate(
+                ContactsFragmentDirections.actionContactsFragmentToChatFragment(
+                    it.contactNumber?.replace(" ", "").toString(),
+                    it.contactName.toString()
+                )
+            )
         }
         binding.rvContactList.adapter = adapter
-        viewModel.contactList.observe(viewLifecycleOwner){
+        viewModel.contactList.observe(viewLifecycleOwner) {
             val orderedContactList = it.distinct()
             adapter.setList(orderedContactList)
         }
@@ -134,7 +138,7 @@ class ContactsFragment : Fragment() {
             it?.let { resource ->
                 when (resource.status) {
                     Status.Success -> {
-                        // TODO: Ivde aa kopu hide akukaa.. karangunna kuntham
+
                     }
                     Status.Loading -> {
                         Timber.d("Loading")

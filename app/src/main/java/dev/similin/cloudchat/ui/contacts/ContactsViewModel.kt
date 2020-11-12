@@ -26,12 +26,13 @@ class ContactsViewModel @ViewModelInject constructor(private val repo: ContactRe
             val list = mutableListOf<ContactsModel>()
             response.body()?.users?.forEach { user ->
                 contacts.forEach { contact ->
-                    if (user.key == contact.contactNumber) {
-                        list.add(ContactsModel(contact.contactNumber, contact.contactName))
+                    if (user.key == contact.contactNumber?.replace(" ", "")) {
+                        list.add(ContactsModel(contact.contactNumber?.replace(" ", ""), contact.contactName))
                     }
                 }
             }
             _contactList.value = list
+            Timber.d(contactList.value.toString())
             emit(Resource.success(response))
         } catch (e: Exception) {
             Timber.e(e)
