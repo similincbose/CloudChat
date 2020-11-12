@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import dev.similin.cloudchat.R
 import dev.similin.cloudchat.databinding.FragmentChatBinding
 import dev.similin.cloudchat.ui.main.MainActivity
 import timber.log.Timber
@@ -43,13 +44,14 @@ class ChatFragment : Fragment() {
 
     private fun addChats() {
         viewModel.addChatReference()
-        viewModel.mapChat.observe(viewLifecycleOwner) {
+        binding.messageArea.setText("")
+        viewModel.mapAddChat.observe(viewLifecycleOwner) {
             it.let { map ->
                 val message = map?.get("message")?.toString()
                 when (val userName = map?.get("user")?.toString()) {
-                    viewModel.getUserPhone() -> addMessageBox("You:-\n$message", 1)
+                    viewModel.getUserPhone() -> addMessageBox(message, 1)
                     viewModel.chatWithUser -> addMessageBox(
-                        viewModel.chatWithUserName + ":-\n" + message,
+                        message,
                         2
                     )
                     else -> Timber.e(userName.toString())
@@ -65,9 +67,9 @@ class ChatFragment : Fragment() {
                 Timber.e(map.toString())
                 val message = map?.get("message")
                 when (val userName = map?.get("user")) {
-                    viewModel.getUserPhone() -> addMessageBox("You:-\n$message", 1)
+                    viewModel.getUserPhone() -> addMessageBox(message, 1)
                     viewModel.chatWithUser -> addMessageBox(
-                        viewModel.chatWithUserName + ":-\n" + message,
+                        message,
                         2
                     )
                     else -> Timber.e(userName.toString())
@@ -90,10 +92,10 @@ class ChatFragment : Fragment() {
         // lp.weight=1.0f;
         if (type == 1) {
             lp.gravity = Gravity.RIGHT
-            /*lp.background=R.drawable.round_in*/
+            textView.setBackgroundResource(R.drawable.round_out)
         } else {
             lp.gravity = Gravity.LEFT
-            /*textView.setBackgroundResource(R.drawable.round_out)*/
+            textView.setBackgroundResource(R.drawable.round_in)
         }
         // textView.setLayoutParams(lp);
         binding.chatLayout.addView(textView)
